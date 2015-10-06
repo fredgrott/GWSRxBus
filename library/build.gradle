@@ -1,29 +1,17 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'de.hannesstruss.godot'
-apply plugin: 'hugo'
-apply plugin: 'spoon'
-apply plugin: 'org.moallemi.advanced-build-version'
 
-advancedVersioning {
-    nameOptions {
-        versionMajor 1
-        versionBuild 0
-    }
-    codeOptions {
+apply plugin: 'com.github.dcendents.android-maven'
 
-        dependsOnTasks 'release'
-
-    }
-    //if flavors than re use nameFormat to include the flavorName
-    outputOptions {
-        renameOutput true
-
-    }
-}
-
-def appVersionName = advancedVersioning.versionName
-def appVersionCode = advancedVersioning.versionCode
-
+def libVersionCode = 1
+def libVersionName = "1.0.0.1"
+// if its a snapshot than version needs to be commit hash instead
+// and end user of lib will put the suffix -SNAPSHOT or commit hash and classifier aar to get
+//lib module version number
+// version = libVersionName
+def siteUrl = 'https://github.com/shareme/GWSRxBus'
+def gitUrl = 'https://github.com/shareme/GWSRxBus.git'
+group = "com.github.shareme"
 
 
 android {
@@ -32,17 +20,15 @@ android {
 
 
     defaultConfig {
-        applicationId "com.github.shareme.gwsrxbus"
         minSdkVersion rootProject.ext.getAt("androidMinSdkVersion")
         targetSdkVersion rootProject.ext.getAt("androidMinSdkVersion")
 
-        versionCode appVersionCode
-        versionName appVersionName
+        versionCode libVersionCode
+        versionName libVersionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
-
     packagingOptions {
         exclude 'LICENSE.txt'
     }
@@ -50,29 +36,16 @@ android {
         abortOnError false
     }
 
-
     aaptOptions {
         noCompress 'txt'
         ignoreAssetsPattern "!.svn:!.git:!.ds_store:!*.scc:.*:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"
-    }
-
-    signingConfigs {
-
-        release {
-            //props stored in gradle.properties at userhome .gradle subfolder
-
-            storeFile file(FREDGROTT_RELEASE_STORE_FILE)
-            storePassword FREDGROTT_RELEASE_STORE_PASSWORD
-            keyAlias FREDGROTT_RELEASE_KEY_ALIAS
-            keyPassword FREDGROTT_RELEASE_KEY_PASSWORD
-        }
-
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
 
     testOptions {
         //puts instrumented test results in reports/androidTests
@@ -100,49 +73,25 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-
-
         }
     }
 }
-//noinspection GroovyMissingReturnStatement
-spoon {
-
-    debug = true
-
-    baseOutputDir = file("$rootProject.ext.ourReportsDir/spoon")
-
-    if (project.hasProperty('spoonClassName')) {
-        className = project.spoonClassName
-
-        if (project.hasProperty('spoonMethodName')) {
-            methodName = project.spoonMethodName
-        }
-    }
-
-}
-
+// When support libs are out of synch with the updated version of support annotations
+// we force gradle to use only one version between the conflicting versions
 //noinspection GroovyAssignabilityCheck
 configurations.all {
     resolutionStrategy.force 'com.android.support:support-annotations:22.2.0'
 }
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile rootProject.ext.tddJunitDependencies.junit
     testCompile rootProject.ext.tddJunitDependencies.mockito
     compile rootProject.ext.androidSupportDependencies.appCompat
-    debugCompile rootProject.ext.appDependencies.leakcanaryAndroidDC
-    releaseCompile rootProject.ext.appDependencies.leakcanaryAndroidNOOPRC
-    compile rootProject.ext.appDependencies.timber
-    compile rootProject.ext.appDependencies.timberLint
     androidTestCompile rootProject.ext.instrumentedTestDependencies.espressoContrib
     androidTestCompile rootProject.ext.instrumentedTestDependencies.espressoCore
     androidTestCompile rootProject.ext.instrumentedTestDependencies.espressoRunner
-    androidTestCompile rootProject.ext.instrumentedTestDependencies.spoonClient
-    compile rootProject.ext.regularDependencies.butterknife
-    compile rootProject.ext.appDependencies.otto
     androidTestCompile(rootProject.ext.instrumentedTestDependencies.assertjAndroid){
         exclude group: 'com.android.support'
     }
@@ -150,19 +99,54 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    compile project(":library")
+    compile rootProject.ext.regularDependencies.rxjava
+    compile rootProject.ext.regularDependencies.rxandroid
 
 }
-//uncomment to enable
-// androidTest gets a class named SystemAnimations and animations disabled and enabled within
-// the ApplicationTest setUp and tearDown
-// an AndroidManifest.xml stripped of its application tag is
-//task grantAnimationPermission(type: Exec, dependsOn: 'installDebug') { // or install{productFlavour}{buildType}
-//    commandLine "adb shell pm grant $android.defaultConfig.testApplicationId android.permission.SET_ANIMATION_SCALE".split(' ')
-//}
-//
-//tasks.whenTaskAdded { task ->
-//    if (task.name.startsWith('connectedAndroidTest')) {
-//        task.dependsOn grantAnimationPermission
-//    }
-//}
+install {
+    repositories.mavenInstaller{
+        pom {
+            project {
+                packaging 'aar'
+                name 'GWSRxBus'
+                url siteUrl
+
+                licenses {
+                    license{
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'shareme'
+                        name 'Fred Grott'
+                        email 'fred.grott@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar){
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc){
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc){
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}

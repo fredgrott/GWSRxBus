@@ -9,6 +9,21 @@ buildscript {
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        //godot plugin
+        classpath 'de.hannesstruss:godot:0.2'
+        //hugo plugin
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+        //spoon plugin
+        classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.0.3'
+        // in app modules
+        // apply plugin: 'com.neenbedankt.android-apt'
+        // need version 1.6 once butterknife is to 7.0.2 stable
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
+        //classpath 'com.genymotion:plugin:1.0'
+        classpath 'org.moallemi.gradle.advanced-build-version:gradle-plugin:1.5.0'
+        //maven tasks for android plugin, if you use jfrog than add that too as I use jitpack instead
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+
     }
 }
 
@@ -16,8 +31,176 @@ allprojects {
     repositories {
         jcenter()
     }
+    tasks.withType(JavaForkOptions) {
+// Forked processes like GradleWorkerMain for tests won't steal focus!
+        jvmArgs '-Djava.awt.headless=true'
+    }
+
 }
+// for jdk8 to avoid the R.java errors
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+//global vars for the usual dependencies I use
+ext {
+
+    //Configure stuff
+    ourReportsDir = '${project.buildDir}/reports'
+    //Android block
+    //def globalConfiguration = rootProject.extensions.getByName("ext")
+    //than globalConfiguration.getAt("androidCompileSdkVersion")
+    androidCompileSdkVersion = 23
+    androidBuildToolsVersion = '23.0.1'
+
+    androidMinSdkVersion = 16
+    androidTargetSdkVersion = 23
+
+
+
+    androidSupportVersion = '23.0.1'
+
+
+    androidSupportDependencies = [
+
+            appCompat: "com.android.support:appcompat-v7:$androidSupportVersion",
+            cardView: "com.android.support:cardview-v7:$androidSupportVersion",
+            customTabs: "com.android.support:customtabs:$androidSupportVersion",
+            design: "com.android.support:design:$androidSupportVersion",
+            gridLayout: "com.android.support:gridlayout-v7:$androidSupportVersion",
+            leanBack: "com.android.support:leanback-v17:$androidSupportVersion",
+            mediaRouter: "com.android.support:mediarouter-v7:$androidSupportVersion",
+            multidex: "com.android.support:multidex:$androidSupportVersion",
+            multidexInstrumentation: "com.android.support:multidex-instrumentation:$androidSupportVersion",
+            palette: "com.android.support:palette-v7:$androidSupportVersion",
+            percent: "com.android.support:percent:$androidSupportVersion",
+            prefeerenceLeanback: "com.android.support:preference-leanback-v17:$androidSupportVersion",
+            preference: "com.android.support:preference-v7:$androidSupportVersion",
+            preferenceFourteen: "com.android.support:preference-v14:$androidSupportVersion",
+            recyclerView: "com.android.support:recyclerview-v7:$androidSupportVersion",
+            supportAnnotations: "com.android.support:support-annotations:$androidSupportVersion",
+            supportFour: "com.android.support:support-v4:$androidSupportVersion",
+            supportThirteen: "com.android.support:support-v13:$androidSupportVersion"
+    ]
+
+    junitVersion = '4.12'
+    mockitoVersion = '1.10.19'
+
+    tddJunitDependencies = [
+            junit: "junit:junit:$junitVersion",
+            mockito: "org.mockito:mockito-core:$mockitoVersion"
+    ]
+
+    espressoContribVersion = '2.2'
+    espressoCoreVersion = '2.2'
+    espressoIdlingResourceVersion = '2.2'
+    espressoIntentsVersion = '2.2'
+    espressoWebVersion = '2.2'
+    espressoRulesVersion = '0.3'
+    espressoRunnerVersion = '0.3'
+    espressoTestingSupportLibVersion = '0.1'
+    espressUIAutomatorVersion = '2.1.1'
+    hamcrestIntegrationVersion = '1.3'
+    hamcrestLibraryVersion = '1.3'
+
+    assertjVersion = '1.1.0'
+
+
+
+    jacocoVersion = '0.7.4.201502262128'
+
+    spoonClientVersion = '1.1.10'
+
+
+    //Remember, test libs are usually out of synch with both support libs and
+    //annotations so need this in each module build file:
+    // configurations.all {
+    //     resolutionStrategy.force 'com.android.support:support-annotations:22.2.0'
+    //}
+    //
+    // with espresso 2.2 it needs to be annotations 22.2.0 see the runner 0.3 pom
+    instrumentedTestDependencies = [
+            espressoContrib: "com.android.support.test.espresso:espresso-contrib:$espressoContribVersion",
+            espressoCore: "com.android.support.test.espresso:espresso-core:$espressoCoreVersion",
+            espressoIdlingResource: "com.android.support.test.espresso:espresso-idling-resource:$espressoIdlingResourceVersion",
+            espressoIntents: "com.android.support.test.espresso:espresso-intents:$espressoIntentsVersion",
+            espressoWeb: "com.android.support.test.espresso:espresso-web:$espressoWebVersion",
+            espressoRules: "com.android.support.test:rules:$espressoRulesVersion",
+            espressoRunner: "com.android.support.test:runner:$espressoRunnerVersion",
+            assertjAndroid: "com.squareup.assertj:assertj-android:$assertjVersion",
+            assertjSupportFour: "com.squareup.assertj:assertj-android-support-v4:$assertjVersion",
+            assertjPlayServices: "com.squareup.assertj:assertj-android-play-services:$assertjVersion",
+            assertjAppCompat:"com.squareup.assertj:assertj-android-appcompat-v7:$assertjVersion",
+            assertjDesign:"com.squareup.assertj:assertj-android-design:$assertjVersion",
+            assertjMediarouter:"com.squareup.assertj:assertj-android-mediarouter-v7:$assertjVersion",
+            assertjGridlayout:"com.squareup.assertj:assertj-android-gridlayout-v7:$assertjVersion",
+            assertjCardview:"com.squareup.assertj:assertj-android-cardview-v7:$assertjVersion",
+            assertjRecyclerview:"com.squareup.assertj:assertj-android-recyclerview-v7:$assertjVersion",
+            assertjPalette:"com.squareup.assertj:assertj-android-palette-v7:$assertjVersion",
+            spoonClient:"com.squareup.spoon:spoon-client:$spoonClientVersion"
+    ]
+
+    picassoVersion = '2.5.2'
+    butterknifeVersion = '7.0.1'
+    rxandroidVersion = '1.0.1'
+    rxjavaVersion = '1.0.14'
+
+
+    regularDependencies = [
+            picasso: "com.squareup.picasso:picasso:$picassoVersion",
+            butterknife: "com.jakewharton:butterknife:$butterknifeVersion",
+            rxandroid: "io.reactivex:rxandroid:$rxandroidVersion",
+            rxjava:"io.reactivex:rxjava:$rxjavaVersion"
+    ]
+
+    leakCanaryVersion = '1.3.1'
+    timberVersion = '3.1.0'
+    ottoVersion = '1.3.8'
+
+    appDependencies = [
+            leakcanaryAndroidDC: "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion",
+            leakcanaryAndroidNOOPRC: "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion",
+            timber:"com.jakewharton.timber:timber:$timberVersion",
+            timberLint:"com.jakewharton.timber:timber-lint:$timberVersion",
+            otto:"com.squareup:otto:$ottoVersion"
+
+    ]
+
+    playServicesVersion = '8.1.0'
+
+    playServicesDependencies = [
+            playServices: "com.google.android.gms:play-services:$playServicesVersion",
+            playServicesAds: "com.google.android.gms:play-services-ads:$playServicesVersion",
+            playServicesAllWear:"com.google.android.gms:play-services-all-wear:$playServicesVersion",
+            playServicesAnalytics:"com.google.android.gms:play-services-analytics:$playServicesVersion",
+            playServicesAppIndexing:"com.google.android.gms:play-services-appindexing:$playServicesVersion",
+            playServicesAppInvite:"com.google.android.gms:play-services-appinvite:$playServicesVersion",
+            playServicesAppState:"com.google.android.gms:play-services-appstate:$playServicesVersion",
+            playServicesBase:"com.google.android.gms:play-services-base:$playServicesVersion",
+            playServicesBasement:"com.google.android.gms:play-services-basement:$playServicesVersion",
+            playServicesCast:"com.google.android.gms:play-services-cast:$playServicesVersion",
+            playServicesDrive:"com.google.android.gms:play-services-drive:$playServicesVersion",
+            playServicesFitness:"com.google.android.gms:play-services-fitness:$playServicesVersion",
+            playServicesGames:"com.google.android.gms:play-services-games:$playServicesVersion",
+            playServicesGCM: "com.google.android.gms:play-services-gcm:$playServicesVersion",
+            playServicesIdentity: "com.google.android.gms:play-services-identity:$playServicesVersion",
+            playServicesLocation: "com.google.android.gms:play-services-location:$playServicesVersion",
+            playServicesMaps:"com.google.android.gms:play-services-maps:$playServicesVersion",
+            playServicesMeasurement:"com.google.android.gms:play-services-measurement:$playServicesVersion",
+            playServicesNearby:"com.google.android.gms:play-services-nearby:$playServicesVersion",
+            playServicesPanorama:"com.google.android.gms:play-services-panorama:$playServicesVersion",
+            playServicesPlus:"com.google.android.gms:play-services-plus:$playServicesVersion",
+            playServicesSafetyNet:"com.google.android.gms:play-services-safetynet:$playServicesVersion",
+            playServicesVision:"com.google.android.gms:play-services-vision:$playServicesVersion",
+            playServicesWallet:"com.google.android.gms:play-services-wallet:$playServicesVersion",
+            playServicesWearable:"com.google.android.gms:play-services-wearable:$playServicesVersion"
+    ]
 }
