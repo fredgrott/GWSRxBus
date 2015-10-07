@@ -23,7 +23,7 @@ import rx.subjects.Subject;
  * object, ActivityEvent object, and an FragmentEvent object and integrate
  * the lifecycle(both system and user) from using those event objects.
  *
- * 
+ *
  *
  * Created by fgrott on 10/6/2015.
  */
