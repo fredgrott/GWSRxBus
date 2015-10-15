@@ -8,7 +8,7 @@ def libVersionName = "1.0.0.1"
 // if its a snapshot than version needs to be commit hash instead
 // and end user of lib will put the suffix -SNAPSHOT or commit hash and classifier aar to get
 //lib module version number
-// version = libVersionName
+version = libVersionName
 def siteUrl = 'https://github.com/shareme/GWSRxBus'
 def gitUrl = 'https://github.com/shareme/GWSRxBus.git'
 group = "com.github.shareme"
