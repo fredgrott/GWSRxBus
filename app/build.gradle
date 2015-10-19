@@ -94,16 +94,19 @@ android {
             debuggable true
             minifyEnabled false
             testCoverageEnabled true
-
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
         }
 
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-matches-android-optimize.pro'
             signingConfig signingConfigs.release
-
+            applicationIdSuffix '.release'
+            versionNameSuffix '-release'
 
         }
+
     }
 }
 //noinspection GroovyMissingReturnStatement
@@ -125,18 +128,20 @@ spoon {
 
 //noinspection GroovyAssignabilityCheck
 configurations.all {
-    resolutionStrategy.force 'com.android.support:support-annotations:22.2.0'
+    resolutionStrategy.force 'com.android.support:support-annotations:23.1.0'
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile rootProject.ext.tddJunitDependencies.junit
     testCompile rootProject.ext.tddJunitDependencies.mockito
+    testCompile rootProject.ext.tddJunitDependencies.assertjJunitCore
+
     compile rootProject.ext.androidSupportDependencies.appCompat
     debugCompile rootProject.ext.appDependencies.leakcanaryAndroidDC
     releaseCompile rootProject.ext.appDependencies.leakcanaryAndroidNOOPRC
     compile rootProject.ext.appDependencies.timber
-    compile rootProject.ext.appDependencies.timberLint
+
     androidTestCompile rootProject.ext.instrumentedTestDependencies.espressoContrib
     androidTestCompile rootProject.ext.instrumentedTestDependencies.espressoCore
     androidTestCompile rootProject.ext.instrumentedTestDependencies.espressoRunner

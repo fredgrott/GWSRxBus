@@ -28,6 +28,25 @@ buildscript {
 }
 
 allprojects {
+    //borrowed from Jake Wharton's gist
+    //https://gist.github.com/JakeWharton/2066f5e4f08fbaaa68fd
+    // ensures we do not ever use wildcards
+    // if lib author has used + wildcard than its
+    // resolutionStrategy.force "group:name:exact_version"
+    afterEvaluate { project ->
+        //noinspection GroovyAssignabilityCheck
+        project.configurations.all {
+
+            resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+                //noinspection GroovyAssignabilityCheck
+                def requested = details.target
+                if (requested.version.contains('+')) {
+                    throw new GradleException("Wildcard dependency forbidden: ${requested.group}:${requested.name}:${requested.version}")
+                }
+            }
+        }
+    }
+
     repositories {
         jcenter()
     }
@@ -66,7 +85,7 @@ ext {
 
 
 
-    androidSupportVersion = '23.0.1'
+    androidSupportVersion = '23.1.0'
 
 
     androidSupportDependencies = [
@@ -93,21 +112,36 @@ ext {
 
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
+    assertJunitVersion = '2.2.0'
 
     tddJunitDependencies = [
             junit: "junit:junit:$junitVersion",
-            mockito: "org.mockito:mockito-core:$mockitoVersion"
+            mockito: "org.mockito:mockito-core:$mockitoVersion",
+            assertjJunitCore:"org.assertj:assertj-core:$assertJunitVersion"
     ]
 
-    espressoContribVersion = '2.2'
-    espressoCoreVersion = '2.2'
-    espressoIdlingResourceVersion = '2.2'
-    espressoIntentsVersion = '2.2'
-    espressoWebVersion = '2.2'
-    espressoRulesVersion = '0.3'
-    espressoRunnerVersion = '0.3'
+    databindingVersion = '1.0-rc3'
+
+    // warning: library pulls baseLibrary but baseLibrary, compiler, dataBinder  is not in
+    // m2repository as of yet and
+    // library will also pull outdated version of support-v4 library
+    // which you will have to force to updated version just like we did with
+    // annotations in the module build scripts
+    databindingDependencies = [
+            databindingAdapters: "com.android.databinding:adapters:$databindingVersion",
+            databingingLibrary: "com.android.databindging:library:$databindingVersion"
+    ]
+
+
+    espressoContribVersion = '2.2.1'
+    espressoCoreVersion = '2.2.1'
+    espressoIdlingResourceVersion = '2.2.1'
+    espressoIntentsVersion = '2.2.1'
+    espressoWebVersion = '2.2.1'
+    espressoRulesVersion = '0.4.1'
+    espressoRunnerVersion = '0.4.1'
     espressoTestingSupportLibVersion = '0.1'
-    espressUIAutomatorVersion = '2.1.1'
+    espressUIAutomatorVersion = '2.1.2'
     hamcrestIntegrationVersion = '1.3'
     hamcrestLibraryVersion = '1.3'
 
@@ -118,6 +152,8 @@ ext {
     jacocoVersion = '0.7.4.201502262128'
 
     spoonClientVersion = '1.1.10'
+
+
 
 
     //Remember, test libs are usually out of synch with both support libs and
@@ -146,30 +182,47 @@ ext {
             assertjRecyclerview:"com.squareup.assertj:assertj-android-recyclerview-v7:$assertjVersion",
             assertjPalette:"com.squareup.assertj:assertj-android-palette-v7:$assertjVersion",
             spoonClient:"com.squareup.spoon:spoon-client:$spoonClientVersion"
+
     ]
 
     picassoVersion = '2.5.2'
     butterknifeVersion = '7.0.1'
     rxandroidVersion = '1.0.1'
     rxjavaVersion = '1.0.14'
+    rxbindingVersion = '0.2.0'
+    rxlifecycleVersion = '0.3.0'
+    sqlbriteversion = '0.4.0'
+    reactivelocationVersion = '0.8'
+    rxpreferencesVersion = '1.0.0'
 
 
     regularDependencies = [
             picasso: "com.squareup.picasso:picasso:$picassoVersion",
             butterknife: "com.jakewharton:butterknife:$butterknifeVersion",
             rxandroid: "io.reactivex:rxandroid:$rxandroidVersion",
-            rxjava:"io.reactivex:rxjava:$rxjavaVersion"
+            rxjava:"io.reactivex:rxjava:$rxjavaVersion",
+            rxbinding:"com.jakewharton.rxbinding:rxbinding:$rxbindingVersion",
+            rxbindingSupportFour:"com.jakewharton.rxbinding:rxbinding-support-v4:$rxbindingVersion",
+            rxbindingAppCompat:"com.jakewharton.rxbinding:rxbinding-appcompat-v7:$rxbindingVersion",
+            rxbindingDesign:"com.jakewharton.rxbinding:rxbinding-design:$rxbindingVersion",
+            rxbindingRecycler:"com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$rxbindingVersion",
+            rxlifecycle:"com.trello:rxlifecycle:$rxlifecycleVersion",
+            rxlifecycleComponents:"com.trello:rxlifecycle-components:$rxlifecycleVersion",
+            sqlbrite:"com.squareup.sqlbrite:sqlbrite:$sqlbriteversion",
+            reactivelocation:"pl.charmas.android:android-reactivve-location:$reactivelocationVersion@aar",
+            rxpreferences:"com.f2prateek.rx.preferences:rx-preferences:$rxpreferencesVersion"
+
     ]
 
     leakCanaryVersion = '1.3.1'
-    timberVersion = '3.1.0'
+    // timber now embeds timberlint so only need timber past 4.0.0
+    timberVersion = '4.0.1'
     ottoVersion = '1.3.8'
 
     appDependencies = [
             leakcanaryAndroidDC: "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion",
             leakcanaryAndroidNOOPRC: "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion",
             timber:"com.jakewharton.timber:timber:$timberVersion",
-            timberLint:"com.jakewharton.timber:timber-lint:$timberVersion",
             otto:"com.squareup:otto:$ottoVersion"
 
     ]

@@ -24,53 +24,11 @@ allprojects {
 ```
 Than in the module buildscript:
 
-This is a little different than a standard maven-ized anrodi library from like bintray-jcenter in that
-is:
 
-        com.github
+```groovy
+compile 'com.github.shareme:GWSRxBus:1.0.0.0@aar'
+```
 
-than my user name as it is in the github repo url
-
-         shareme
-
-than its the repo name as it appears in the github repo url
-for example
-
-           GWSDroidGradle
-
-so lets put that first part together
-
-           com.github.shareme.GWSDroidGradle
-
-at this point to pull the library artifact if no release has been uploaded to  github than you would add
-
-          -SNAPSHOT
-
-thus for no release yet it would be
-
-         com.github.shareme.GWSDroidGradle:library:-SNAPSHOT
-
-to get a library module of a gitub repo that has uploaded a release you would do something like:
-
-     com.github.shareme.GWSDroidGradle:library:1.0.0@aar
-
-jitpack takes care of modifying the groupID and artifactID when it builds the github repo so that the
-generated maven pom will be right even with multiple modules as even the simplest android library might
-have a demo app within the same repo using the library.
-
-Obviously, for advance stuff like multiple aars from on library, etc see the jitpack.io site for details.
-And! Yes, the javadoc can be viewed as:
-
-https://jitpack.io/com/github/shareme/GWSDroidGradle/1.0.0.0/javadoc/
-
-that's
-
-https://jitpack.io/com/gtihub/USEr/REPO/VERSION/javadoc/
-
-Only an example do not go there..nothing to see.
-
-That concludes the little lesson in  taking a github repo and getting the android library aar through
-the magic that jitpack has set-up.
 
 
 Target Android API Range
