@@ -3,6 +3,8 @@ apply plugin: 'de.hannesstruss.godot'
 apply plugin: 'hugo'
 apply plugin: 'spoon'
 apply plugin: 'org.moallemi.advanced-build-version'
+apply plugin: 'view-inspector'
+
 
 advancedVersioning {
     nameOptions {
@@ -60,12 +62,16 @@ android {
 
         release {
             //props stored in gradle.properties at userhome .gradle subfolder
+            // for product release and you just substitute the correct vars
+            // otherwise for demo of libs use what is listed
 
-            storeFile file(FREDGROTT_RELEASE_STORE_FILE)
-            storePassword FREDGROTT_RELEASE_STORE_PASSWORD
-            keyAlias FREDGROTT_RELEASE_KEY_ALIAS
-            keyPassword FREDGROTT_RELEASE_KEY_PASSWORD
+            storeFile file('demokey.jks')
+            storePassword 'droiddroid'
+            keyAlias 'dkey'
+            keyPassword 'droiddroid'
         }
+
+
 
     }
 

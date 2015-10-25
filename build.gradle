@@ -23,6 +23,10 @@ buildscript {
         classpath 'org.moallemi.gradle.advanced-build-version:gradle-plugin:1.5.0'
         //maven tasks for android plugin, if you use jfrog than add that too as I use jitpack instead
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+        //view-inspector puts a view inspector and other debug tools in a view group
+        // only accessible in the debug of an app
+        classpath 'com.github.xfumihiro.view-inspector:view-inspector-plugin:0.1.0'
+
 
     }
 }

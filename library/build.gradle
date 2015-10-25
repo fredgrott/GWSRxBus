@@ -103,6 +103,7 @@ dependencies {
 
     compile rootProject.ext.regularDependencies.rxjava
     compile rootProject.ext.regularDependencies.rxandroid
+    compile rootProject.ext.appDependencies.timber
 
 }
 install {
