@@ -48,6 +48,7 @@ allprojects {
                     throw new GradleException("Wildcard dependency forbidden: ${requested.group}:${requested.name}:${requested.version}")
                 }
             }
+            resolutionStrategy.force 'com.android.support:support-annotations:23.1.0'
         }
     }
 
@@ -55,18 +56,16 @@ allprojects {
         jcenter()
     }
     tasks.withType(JavaForkOptions) {
-// Forked processes like GradleWorkerMain for tests won't steal focus!
+    // Forked processes like GradleWorkerMain for tests won't steal focus!
         jvmArgs '-Djava.awt.headless=true'
     }
-
-}
-// for jdk8 to avoid the R.java errors
-if (JavaVersion.current().isJava8Compatible()) {
-    allprojects {
+    // for jdk8 to avoid the R.java errors
+    if (JavaVersion.current().isJava8Compatible()) {
         tasks.withType(Javadoc) {
             options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
+
 }
 
 

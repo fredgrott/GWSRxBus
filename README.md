@@ -26,7 +26,7 @@ Than in the module buildscript:
 
 
 ```groovy
-compile 'com.github.shareme:GWSRxBus:1.0.0.0@aar'
+compile 'com.github.shareme:GWSRxBus:{latest-release-number}@aar'
 ```
 
 

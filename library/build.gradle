@@ -76,12 +76,7 @@ android {
         }
     }
 }
-// When support libs are out of synch with the updated version of support annotations
-// we force gradle to use only one version between the conflicting versions
-//noinspection GroovyAssignabilityCheck
-configurations.all {
-    resolutionStrategy.force 'com.android.support:support-annotations:23.1.0'
-}
+
 
 
 dependencies {
